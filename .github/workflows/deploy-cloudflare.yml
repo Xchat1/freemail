@@ -2,11 +2,15 @@ name: 🚀 Deploy freemail to Cloudflare Workers
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
     paths:
       - "src/**"
       - "public/**"
       - "wrangler.toml"
+      - "package.json"
+      - "package-lock.json"
+      - "d1-init.sql"
+      - ".github/workflows/deploy-cloudflare.yml"
   workflow_dispatch:
 
 jobs:
@@ -69,7 +73,18 @@ jobs:
           fi
 
           if [ -z "$JWT_TOKEN" ]; then
-            echo "⚠️ Warning: JWT_TOKEN is not set, using default from wrangler.toml"
+            echo "❌ JWT_TOKEN is required. Set it in GitHub Secrets or Variables."
+            exit 1
+          fi
+
+          if [ -z "$ADMIN_PASSWORD" ]; then
+            echo "❌ ADMIN_PASSWORD is required. Set it in GitHub Secrets or Variables."
+            exit 1
+          fi
+
+          if [ -z "$MAIL_DOMAIN" ]; then
+            echo "❌ MAIL_DOMAIN is required. Set it in GitHub Secrets or Variables."
+            exit 1
           fi
 
           echo "✅ Validation passed."
@@ -80,6 +95,46 @@ jobs:
 
           CONFIG_FILE="wrangler-deploy.toml"
           cp wrangler.toml "$CONFIG_FILE"
+
+          toml_escape() {
+            local value="$1"
+            value="${value//\\/\\\\}"
+            value="${value//\"/\\\"}"
+            printf '%s' "$value"
+          }
+
+          set_config_var() {
+            local key="$1"
+            local value="$2"
+            local escaped
+            local line
+            local tmp
+            escaped="$(toml_escape "$value")"
+            line="${key}=\"${escaped}\""
+            tmp="${CONFIG_FILE}.tmp"
+            if grep -q "^${key}=" "$CONFIG_FILE"; then
+              awk -v key="$key" -v line="$line" '
+                $0 ~ "^" key "=" { print line; next }
+                { print }
+              ' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
+            else
+              awk -v line="$line" '
+                { print }
+                $0 == "[vars]" { print line; inserted = 1 }
+                END {
+                  if (!inserted) {
+                    print ""
+                    print "[vars]"
+                    print line
+                  }
+                }
+              ' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
+            fi
+          }
+
+          remove_config_var() {
+            sed -i "/^${1}=/d" "$CONFIG_FILE"
+          }
 
           # 替换 Worker 名称
           sed -i "s|^name = .*|name = \"${NAME}\"|" "$CONFIG_FILE"
@@ -93,47 +148,39 @@ jobs:
 
           # 注入环境变量（如果设置了的话）
           if [ -n "$ADMIN_NAME" ]; then
-            sed -i "s|^ADMIN_NAME=.*|ADMIN_NAME=\"${ADMIN_NAME}\"|" "$CONFIG_FILE"
+            set_config_var "ADMIN_NAME" "$ADMIN_NAME"
           fi
 
           if [ -n "$ADMIN_PASSWORD" ]; then
-            sed -i "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=\"${ADMIN_PASSWORD}\"|" "$CONFIG_FILE"
+            set_config_var "ADMIN_PASSWORD" "$ADMIN_PASSWORD"
           fi
 
           # GUEST_PASSWORD: 如果未设置则从配置中删除
           GUEST_PASSWORD="${{ secrets.GUEST_PASSWORD || vars.GUEST_PASSWORD }}"
           if [ -n "$GUEST_PASSWORD" ]; then
-            sed -i "s|^GUEST_PASSWORD=.*|GUEST_PASSWORD=\"${GUEST_PASSWORD}\"|" "$CONFIG_FILE"
+            set_config_var "GUEST_PASSWORD" "$GUEST_PASSWORD"
           else
-            sed -i '/^GUEST_PASSWORD=/d' "$CONFIG_FILE"
+            remove_config_var "GUEST_PASSWORD"
           fi
 
           if [ -n "$JWT_TOKEN" ]; then
-            sed -i "s|^JWT_TOKEN=.*|JWT_TOKEN=\"${JWT_TOKEN}\"|" "$CONFIG_FILE"
-          fi
-
-          # JWT_TOKENGUEST_PASSWORD: 如果未设置则从配置中删除
-          JWT_TOKENGUEST_PASSWORD="${{ secrets.JWT_TOKENGUEST_PASSWORD || vars.JWT_TOKENGUEST_PASSWORD }}"
-          if [ -n "$JWT_TOKENGUEST_PASSWORD" ]; then
-            sed -i "s|^JWT_TOKENGUEST_PASSWORD=.*|JWT_TOKENGUEST_PASSWORD=\"${JWT_TOKENGUEST_PASSWORD}\"|" "$CONFIG_FILE"
-          else
-            sed -i '/^JWT_TOKENGUEST_PASSWORD=/d' "$CONFIG_FILE"
+            set_config_var "JWT_TOKEN" "$JWT_TOKEN"
           fi
 
           if [ -n "$SESSION_EXPIRE_DAYS" ]; then
-            sed -i "s|^SESSION_EXPIRE_DAYS=.*|SESSION_EXPIRE_DAYS=\"${SESSION_EXPIRE_DAYS}\"|" "$CONFIG_FILE"
+            set_config_var "SESSION_EXPIRE_DAYS" "$SESSION_EXPIRE_DAYS"
           fi
 
           if [ -n "$MAIL_DOMAIN" ]; then
-            sed -i "s|^MAIL_DOMAIN=.*|MAIL_DOMAIN=\"${MAIL_DOMAIN}\"|" "$CONFIG_FILE"
+            set_config_var "MAIL_DOMAIN" "$MAIL_DOMAIN"
           fi
 
           # RESEND_API_KEY: 如果未设置则从配置中删除
           RESEND_API_KEY="${{ secrets.RESEND_API_KEY || vars.RESEND_API_KEY }}"
           if [ -n "$RESEND_API_KEY" ]; then
-            sed -i "s|^RESEND_API_KEY=.*|RESEND_API_KEY=\"${RESEND_API_KEY}\"|" "$CONFIG_FILE"
+            set_config_var "RESEND_API_KEY" "$RESEND_API_KEY"
           else
-            sed -i '/^RESEND_API_KEY=/d' "$CONFIG_FILE"
+            remove_config_var "RESEND_API_KEY"
           fi
 
           echo "✅ Config generated."

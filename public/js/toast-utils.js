@@ -13,13 +13,26 @@
 let __toastTpl = null;
 let __toastTplPromise = null;
 
-// 图标映射配置 - 使用最基本的字符确保兼容性
+// 图标映射配置
 const ICON_MAP = {
-  'success': '✓',
-  'warn': '!', 
-  'error': '×',
-  'info': 'i'
+  'success': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-check"/></svg>',
+  'warn': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-alert"/></svg>',
+  'error': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-x"/></svg>',
+  'info': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-mail"/></svg>'
 };
+
+function normalizeType(type) {
+  return type === 'warning' ? 'warn' : (type || 'info');
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 // Toast容器配置
 const CONTAINER_STYLES = {
@@ -77,6 +90,9 @@ function ensureToastContainer() {
  * @param {number} duration - 显示时长(ms), 默认3000
  */
 async function showToast(message, type = 'info', duration = 3000) {
+  const safeType = normalizeType(type);
+  const safeMessage = escapeHtml(message);
+
   try {
     // 获取模板
     if (!__toastTpl) {
@@ -91,14 +107,14 @@ async function showToast(message, type = 'info', duration = 3000) {
     }
     
     // 获取图标
-    const icon = ICON_MAP[type] || ICON_MAP.info;
+    const icon = ICON_MAP[safeType] || ICON_MAP.info;
     
     // 渲染模板
     const tpl = __toastTpl || '';
     const html = tpl
-      .replace('{{type}}', String(type || 'info'))
+      .replace('{{type}}', safeType)
       .replace('{{icon}}', icon)
-      .replace('{{message}}', String(message || ''));
+      .replace('{{message}}', safeMessage);
     
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html;
@@ -129,8 +145,8 @@ async function showToast(message, type = 'info', duration = 3000) {
   } catch (_) {
     // 降级到简易toast
     const div = document.createElement('div');
-    div.className = `toast-item ${type}`;
-    div.innerHTML = `<span class="toast-icon">${ICON_MAP[type] || ICON_MAP.info}</span><span class="toast-message">${message}</span>`;
+    div.className = `toast-item ${safeType}`;
+    div.innerHTML = `<span class="toast-icon">${ICON_MAP[safeType] || ICON_MAP.info}</span><span class="toast-message">${safeMessage}</span>`;
     
     const container = ensureToastContainer();
     container.appendChild(div);

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>登录 - 临时邮箱</title>
+    <title>登录 - Mail Console</title>
     <style>.precheck-hide body{ visibility: hidden; }</style>
     <script>
       // 立即检查登录状态（在任何其他脚本之前）
@@ -108,8 +108,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/login.css" />
-    <!-- 暗黑模式样式 -->
+    <!-- 深色模式样式 -->
     <link rel="stylesheet" href="/css/login_black.css" />
+    <link rel="stylesheet" href="/css/professional.css" />
     <!-- 主题切换支持 -->
     <script src="/js/theme-toggle.js"></script>
   </head>
@@ -125,15 +126,15 @@
       <div class="card">
         <div class="logo">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L7.5 13.5m0 0l3 3L6 17l-1.5-3.5"/>
+            <use href="/icons/sprites.svg#icon-mail"/>
           </svg>
         </div>
-        <h1>登录到临时邮箱</h1>
+        <h1>登录邮箱控制台</h1>
         <div id="err" class="err"></div>
         <input id="username" class="input" type="text" placeholder="用户名/邮箱" aria-label="用户名或邮箱地址" />
         <input id="pwd" class="input" type="password" placeholder="密码" aria-label="密码" />
-        <div style="font-size:12px;color:#64748b;margin-bottom:8px">
-          账号：guest，密码：guest，将进入观看模式。
+        <div class="login-hint">
+          可使用管理员、普通用户或已启用登录的邮箱账号进入。
         </div>
         <button id="login" class="btn">登录</button>
       </div>
@@ -151,7 +152,7 @@
           var t = window.freemailTheme.getTheme();
           var icon = btn.querySelector('svg use');
           if (icon) icon.setAttribute('href', '/icons/sprites.svg#icon-' + (t === 'dark' ? 'sun' : 'moon'));
-          btn.title = t === 'dark' ? '切换到明亮模式' : '切换到暗黑模式';
+          btn.title = t === 'dark' ? '切换到浅色模式' : '切换到深色模式';
         }
         btn.addEventListener('click', function(e) {
           e.preventDefault();
@@ -161,4 +162,3 @@
     </script>
   </body>
   </html>
-

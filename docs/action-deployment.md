@@ -31,15 +31,15 @@
 | **`CLOUDFLARE_ACCOUNT_ID`** | 您的 Cloudflare Account ID（来源见上文） |
 | **`CLOUDFLARE_API_TOKEN`** | 您的 Cloudflare API 令牌（来源见上文） |
 
-### ⚙️ 应用配置项 (Variables / Secrets)
-以下参数用于构建应用配置，Action 执行时会尝试读取并覆盖代码默认值。**如果非必选的选项为空，则使用代码里 `wrangler.toml` 文件自带的默认配置。**
+### 应用配置项 (Variables / Secrets)
+以下参数用于构建应用配置，Action 执行时会读取 GitHub Secrets 或 Variables 并写入部署配置。核心必填项缺失时部署会直接停止；非必填项为空时才会使用 `wrangler.toml` 中的默认值或保持关闭。
 *(规则建议：需要保密的诸如 Password、Token 放入 `Secrets`；公开名称类的放入 `Variables`)*
 
 | 变量名 | 状态 | 默认值 (如果未配置) | 作用说明 |
 | --- | :-: | --- | --- |
-| `MAIL_DOMAIN` | **核心必填** | （空）| 您绑定的自定义的接发邮件信箱根域名，**必填，否则无法收发邮件** |
-| `ADMIN_PASSWORD`| **强烈建议** | 读取默认配置 | 管理员后台独立登录密码，**外网部署极其建议在 Secrets 配置以策安全** |
-| `JWT_TOKEN` | **强烈建议** | 读取默认配置 | 用于签发身份票据的 JWT 密钥，请使用一段长且乱的复杂随机字符串 |
+| `MAIL_DOMAIN` | **核心必填** | 无 | 您绑定的自定义的接发邮件信箱根域名，**必填，否则无法收发邮件** |
+| `ADMIN_PASSWORD`| **核心必填** | 无 | 管理员后台独立登录密码，外网部署请放在 Secrets |
+| `JWT_TOKEN` | **核心必填** | 无 | 用于签发身份票据和超管 API 令牌的密钥，请使用一段长且乱的复杂随机字符串并放在 Secrets |
 | `NAME` | 选填 | `mailfree` | 发布在云端 Cloudflare Worker 里的服务名称 |
 | `D1_DB_NAME` | 选填 | `mail_free_db` | D1 数据库名字。部署时如果发现库不存在，脚本会自动新建 |
 | `R2_BUCKET_NAME`| 选填 | `mail-eml` | R2 存储桶名字。部署时如果不存在，系统会自动新建 |
@@ -47,13 +47,12 @@
 | `SESSION_EXPIRE_DAYS` | 选填 | `365` | 会话自动超时天数（登录后台后能保持多久） |
 | `RESEND_API_KEY`| 选填 | （空） | 需要发信的若是使用 Resend 的 API Key 凭证 |
 | `GUEST_PASSWORD`| 选填 | （空） | 如果开放访客阅读功能，为访客账号单独指定的阅读密码 |
-| `JWT_TOKENGUEST_PASSWORD`| 选填 | （空） | 配合上面访客功能专门设立的额外凭据 |
 
 ## 3. 触发自动部署
 
-当 `Secrets` 和 `Variables` 全部配制就位，您就可以让系统自动运行部署了：
+当 `Secrets` 和 `Variables` 全部配置就位，您就可以让系统自动运行部署了：
 
-1. **基于推送的自动化**: 从现在起，当您将任何更新代码（指代 `src/`、`public/` 内容或修改了 `wrangler.toml` 文件的提交）合入 `main` 分支时，都会自动开启部署流水线。
-2. **手动开启强制部署**: 点击仓库上部的 `Actions` 选项卡，在左边流工作栏选中 `🚀 Deploy freemail to Cloudflare Workers`，之后点击右侧的 **Run workflow** 按钮启动部署流水线。
+1. **基于推送的自动化**: 从现在起，当涉及 `src/`、`public/` 或 `wrangler.toml` 等关键文件的提交合入 `main` 或 `master` 分支时，都会自动开启部署流水线。
+2. **手动开启强制部署**: 点击仓库上部的 `Actions` 选项卡，在左侧工作流列表中选中 `Deploy freemail to Cloudflare Workers`，之后点击右侧的 **Run workflow** 按钮启动部署流水线。
 
-等待片刻，如果是看到 `✅ Deployment completed successfully!`，则说明部署已经圆满成功，并且构建过程底部还会输出您最终可以直接访问的网页端 Worker URL 连接！
+等待片刻，如果看到 `Deployment completed successfully!`，则说明部署已完成，构建日志底部会输出可以直接访问的 Worker URL。

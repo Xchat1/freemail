@@ -92,7 +92,7 @@ export function buildMockEmails(count = 6) {
     subject: subjects[i % subjects.length],
     received_at: new Date(Date.now() - i * 3600000).toISOString().replace('T', ' ').slice(0, 19),
     is_read: i > 2 ? 1 : 0,
-    preview: '这是一封演示邮件的预览内容...',
+    preview: '这是一封演示邮件的预览内容…',
     verification_code: i === 1 ? '123456' : null
   }));
 }
@@ -186,6 +186,11 @@ export async function mockApi(path, options = {}) {
   if (url.pathname.startsWith('/api/email/') && (!options.method || options.method === 'GET')) {
     const id = Number(url.pathname.split('/')[3]);
     return new Response(JSON.stringify(buildMockEmailDetail(id)), { headers: jsonHeaders });
+  }
+
+  // GET /api/sent
+  if (url.pathname === '/api/sent' && (!options.method || options.method === 'GET')) {
+    return new Response(JSON.stringify([]), { headers: jsonHeaders });
   }
 
   // GET /api/mailboxes

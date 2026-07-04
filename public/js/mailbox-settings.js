@@ -89,7 +89,7 @@ export async function saveForwardSetting(mailboxId, forwardTo) {
   const btn = document.getElementById('save-forward-btn');
   if (btn) {
     btn.disabled = true;
-    btn.textContent = '保存中...';
+    btn.textContent = '保存中…';
   }
   
   try {
@@ -205,7 +205,7 @@ export async function batchSetFavorite(mailboxIds, isFavorite) {
  */
 export function renderForwardBadge(forwardTo) {
   if (!forwardTo) return '';
-  return `<span class="badge badge-forward" title="转发到: ${escapeHtml(forwardTo)}">↪️</span>`;
+  return `<span class="badge badge-forward" title="转发到: ${escapeHtml(forwardTo)}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-forward"/></svg></span>`;
 }
 
 /**
@@ -214,7 +214,7 @@ export function renderForwardBadge(forwardTo) {
  * @returns {string} HTML 字符串
  */
 export function renderFavoriteBadge(isFavorite) {
-  return isFavorite ? '<span class="badge badge-favorite" title="已收藏">⭐</span>' : '';
+  return isFavorite ? '<span class="badge badge-favorite" title="已收藏"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><use href="/icons/sprites.svg#icon-star"/></svg></span>' : '';
 }
 
 /**
@@ -228,7 +228,7 @@ export function createForwardButton(mailboxId, mailboxAddress, forwardTo) {
   const btn = document.createElement('button');
   btn.className = 'btn btn-ghost btn-sm';
   btn.title = forwardTo ? `转发到: ${forwardTo}` : '设置转发';
-  btn.innerHTML = forwardTo ? '↪️' : '➡️';
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-forward"/></svg>';
   btn.onclick = (e) => {
     e.stopPropagation();
     openForwardDialog(mailboxId, mailboxAddress, forwardTo);
@@ -247,7 +247,9 @@ export function createFavoriteButton(mailboxId, isFavorite, onUpdate) {
   const btn = document.createElement('button');
   btn.className = 'btn btn-ghost btn-sm';
   btn.title = isFavorite ? '取消收藏' : '收藏';
-  btn.innerHTML = isFavorite ? '⭐' : '☆';
+  btn.innerHTML = isFavorite
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="/icons/sprites.svg#icon-star"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-star-empty"/></svg>';
   btn.onclick = async (e) => {
     e.stopPropagation();
     const result = await toggleFavorite(mailboxId);

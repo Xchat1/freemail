@@ -50,11 +50,11 @@ export function buildMockEmails(count = 5) {
     '[演示数据] 账户安全提醒'
   ];
   const previews = [
-    '这是一封演示邮件，用于展示系统功能...',
-    '您的验证码是 123456，请在5分钟内使用...',
-    '您的订单已发货，预计3-5天送达...',
-    '您请求重置密码，请点击链接...',
-    '检测到您的账户有异常登录...'
+    '这是一封演示邮件，用于展示系统功能…',
+    '您的验证码是 123456，请在5分钟内使用…',
+    '您的订单已发货，预计3-5天送达…',
+    '您请求重置密码，请点击链接…',
+    '检测到您的账户有异常登录…'
   ];
   
   const emails = [];
@@ -118,7 +118,7 @@ export function buildMockEmailDetail(emailId) {
     to_addrs: 'demo@exa.cc',
     subject: '[演示数据] 这是一封演示邮件',
     verification_code: '123456',
-    preview: '这是演示邮件的内容预览...',
+    preview: '这是演示邮件的内容预览…',
     content: '这是演示邮件的纯文本内容。\n\n您的验证码是：123456\n\n请在5分钟内使用。',
     html_content: '<div style="padding:20px;"><h2>演示邮件</h2><p>您的验证码是：<strong>123456</strong></p><p>请在5分钟内使用。</p></div>',
     received_at: new Date().toISOString(),

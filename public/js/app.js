@@ -44,6 +44,7 @@ async function api(path, options) {
 const app = document.getElementById('app');
 const templateResp = await fetch('/html/app.html', { cache: 'force-cache' }).catch(() => null);
 app.innerHTML = templateResp && templateResp.ok ? await templateResp.text() : await (await fetch('/html/app.html', { cache: 'no-cache' })).text();
+document.body.classList.add('mail-list-empty', 'mail-no-selection');
 
 // DOM 元素
 const els = {
@@ -85,6 +86,41 @@ function showHeaderLoading(t) { if (els.listLoading) { els.listLoading.innerHTML
 function hideHeaderLoading() { if (els.listLoading) els.listLoading.style.display = 'none'; }
 function showCountdown() { if (els.listLoading) { els.listLoading.innerHTML = `<span class="countdown-icon">⏱</span>${countdown}s 后刷新`; els.listLoading.style.display = 'flex'; }}
 
+function clearReadingPane() {
+  document.body.classList.add('mail-no-selection');
+  document.querySelectorAll('.email-item.selected').forEach(item => item.classList.remove('selected'));
+  const readingPane = document.getElementById('reading-pane');
+  if (readingPane) readingPane.classList.remove('has-message');
+  const subject = document.getElementById('reading-subject');
+  const meta = document.getElementById('reading-meta');
+  const content = document.getElementById('reading-content');
+  if (subject) subject.textContent = '选择一封邮件';
+  if (meta) meta.textContent = '';
+  if (content) content.innerHTML = `<div class="reading-empty">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <use href="/icons/sprites.svg#icon-mail"/>
+    </svg>
+    <p>从中间列表选择一封邮件，内容会在这里显示。</p>
+  </div>`;
+}
+
+function renderEmptyList(message = '当前邮箱还没有收到邮件。你可以刷新，或复制邮箱去接收验证码。') {
+  document.body.classList.add('mail-list-empty', 'mail-no-selection');
+  clearReadingPane();
+  if (els.list) els.list.innerHTML = `<div class="empty-state mail-empty-state">
+    <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <use href="/icons/sprites.svg#icon-inbox"/>
+    </svg>
+    <strong>暂无邮件</strong>
+    <span class="empty-text">${message}</span>
+    <div class="empty-actions">
+      <button class="btn btn-primary btn-sm" onclick="window.refreshEmails && window.refreshEmails()">刷新</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('copy')?.click()">复制邮箱</button>
+    </div>
+  </div>`;
+  if (els.pager) els.pager.style.display = 'none';
+}
+
 // 刷新邮件列表
 async function refresh() {
   const mailbox = getCurrentMailbox();
@@ -97,20 +133,17 @@ async function refresh() {
     let emails = [];
     try { const r = await api(url, { signal: ctrl.signal }); emails = await r.json(); } finally { clearTimeout(timeout); }
     if (!Array.isArray(emails) || !emails.length) {
-      els.list.innerHTML = `<div class="empty-state">
-        <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <use href="/icons/sprites.svg#icon-inbox"/>
-        </svg>
-        <span class="empty-text">暂无邮件</span>
-      </div>`;
-      if (els.pager) els.pager.style.display = 'none';
+      renderEmptyList(isSentViewActive() ? '这里会显示从当前邮箱发出的邮件。' : undefined);
       return;
     }
+    document.body.classList.remove('mail-list-empty');
     const isMobile = window.matchMedia?.('(max-width: 900px)').matches;
     els.list.innerHTML = sliceByPage(emails, els).map(e => renderEmailItem(e, isMobile)).join('');
     if (!isSentViewActive()) prefetchEmails(emails, api);
     markViewLoaded();
-  } catch (_) {}
+  } catch (_) {
+    renderEmptyList(isSentViewActive() ? '这里会显示从当前邮箱发出的邮件。' : '邮件列表暂时不可用，请稍后刷新。');
+  }
   finally { hideHeaderLoading(); if (getCurrentMailbox()) { countdown = REFRESH_INTERVAL; showCountdown(); } }
 }
 
@@ -165,8 +198,8 @@ if (els.modalClose) els.modalClose.onclick = () => els.modal?.classList.remove('
 els.modal?.addEventListener('click', (e) => { if (e.target === els.modal) els.modal.classList.remove('show'); });
 
 // 视图切换
-if (els.tabInbox) els.tabInbox.onclick = () => { setView(false); els.tabInbox.classList.add('active'); els.tabSent?.classList.remove('active'); if (els.boxTitle) els.boxTitle.textContent = '收件箱'; if (els.boxIcon) els.boxIcon.textContent = '📥'; resetPager(els); refresh(); };
-if (els.tabSent) els.tabSent.onclick = () => { setView(true); els.tabSent.classList.add('active'); els.tabInbox?.classList.remove('active'); if (els.boxTitle) els.boxTitle.textContent = '发件箱'; if (els.boxIcon) els.boxIcon.textContent = '📤'; resetPager(els); refresh(); };
+if (els.tabInbox) els.tabInbox.onclick = () => { setView(false); clearReadingPane(); els.tabInbox.classList.add('active'); els.tabSent?.classList.remove('active'); els.tabInbox.setAttribute('aria-pressed', 'true'); els.tabSent?.setAttribute('aria-pressed', 'false'); if (els.boxTitle) els.boxTitle.textContent = '收件箱'; if (els.boxIcon) els.boxIcon.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-inbox"/></svg>'; resetPager(els); refresh(); };
+if (els.tabSent) els.tabSent.onclick = () => { setView(true); clearReadingPane(); els.tabSent.classList.add('active'); els.tabInbox?.classList.remove('active'); els.tabSent.setAttribute('aria-pressed', 'true'); els.tabInbox?.setAttribute('aria-pressed', 'false'); if (els.boxTitle) els.boxTitle.textContent = '已发送'; if (els.boxIcon) els.boxIcon.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-send"/></svg>'; resetPager(els); refresh(); };
 
 // 分页
 if (els.prevPage) els.prevPage.onclick = () => prevPage(refresh);

@@ -40,7 +40,7 @@ export function truncateText(text, maxLength = 100) {
   if (!text) return '';
   const s = String(text).trim();
   if (s.length <= maxLength) return s;
-  return s.slice(0, maxLength) + '...';
+  return s.slice(0, maxLength) + '…';
 }
 
 /**
@@ -65,7 +65,7 @@ export function renderEmailItem(email) {
       </div>
       <div class="email-subject">${subject}</div>
       <div class="email-preview">${preview}</div>
-      ${verificationCode ? `<div class="email-code" title="点击复制验证码">🔑 ${escapeHtml(verificationCode)}</div>` : ''}
+      ${verificationCode ? `<div class="email-code" title="点击复制验证码"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-key"/></svg> ${escapeHtml(verificationCode)}</div>` : ''}
     </div>
   `;
 }

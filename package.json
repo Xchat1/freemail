@@ -1,4 +1,9 @@
 {
+  "type": "module",
+  "scripts": {
+    "check": "npm run check:js",
+    "check:js": "node scripts/check-js-syntax.mjs"
+  },
   "dependencies": {
     "postal-mime": "^2.7.4"
   }

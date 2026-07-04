@@ -199,7 +199,7 @@ export function isValidEmail(email) {
  * @param {string} suffix - 后缀
  * @returns {string}
  */
-export function truncate(str, maxLength = 50, suffix = '...') {
+export function truncate(str, maxLength = 50, suffix = '…') {
   if (!str) return '';
   const s = String(str);
   if (s.length <= maxLength) return s;

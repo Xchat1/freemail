@@ -8,7 +8,7 @@
 
 `本邮箱服务支持接收邮件时自动创建对应的邮箱，便于api用户使用，减少worker调用，邮箱服务的转发目标邮箱地址需要在cloudflare Email Addresses中验证`
 
-📖 **[一键部署指南](docs/yijianbushu.md)** | 🤖 **[Github Action 部署指南](docs/action-deployment.md)** | 📬 **[Resend 发件配置](docs/resend.md)** | 📚 **[API 文档](docs/api.md)**
+📖 **[一键部署指南](docs/yijianbushu.md)** | 🤖 **[GitHub Actions 部署指南](docs/action-deployment.md)** | 📬 **[Resend 发件配置](docs/resend.md)** | 📚 **[API 文档](docs/api.md)**
 
 ## 📸 项目展示
 ### 体验地址： https://mailexhibit.dinging.top/
@@ -20,8 +20,8 @@
 #### 首页
 ![首页展示](./pic/light/shouye.png)
 
-#### 所有邮箱
-![所有邮箱](./pic/light/suoyouyouxiang.png)
+#### 邮箱总览
+![邮箱总览](./pic/light/suoyouyouxiang.png)
 
 #### 用户管理
 ![用户管理](./pic/light/yonghuguanli.png)
@@ -75,8 +75,12 @@
 | ADMIN_PASSWORD | 严格管理员密码 | 是 |
 | ADMIN_NAME | 严格管理员用户名（默认 `admin`） | 否 |
 | JWT_TOKEN | JWT 签名密钥 | 是 |
+| SESSION_EXPIRE_DAYS | 登录会话过期天数（默认 `7`） | 否 |
+| GUEST_PASSWORD | 访客演示账号 `guest` 的登录密码 | 否 |
 | RESEND_API_KEY | Resend 发件密钥，支持多域名配置 | 否 |
 | FORWARD_RULES | 邮件转发规则 | 否 |
+
+> 自动部署会强制要求配置 `MAIL_DOMAIN`、`ADMIN_PASSWORD` 和 `JWT_TOKEN`。请将 `ADMIN_PASSWORD`、`JWT_TOKEN` 放在 GitHub Secrets 或 Cloudflare Secrets 中，不要提交真实密钥。
 
 <details>
 <summary><strong>RESEND_API_KEY 配置格式</strong></summary>
@@ -150,7 +154,7 @@ wrangler d1 execute TEMP_MAIL_DB --command "SELECT * FROM mailboxes LIMIT 10"
 
 - **静态资源缓存**：更新后在 Cloudflare 控制台 Purge Everything，浏览器强制刷新
 - **R2/D1 费用**：有免费额度限制，建议定期清理过期邮件
-- **安全**：生产环境务必修改默认的 `ADMIN_PASSWORD` 和 `JWT_TOKEN`
+- **安全**：生产环境务必设置强 `ADMIN_PASSWORD` 和 `JWT_TOKEN`，不要把真实密钥提交到仓库
 
 ## 自动部署
 

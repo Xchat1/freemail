@@ -42,7 +42,7 @@ export function renderUserRow(user) {
   const roleClass = user.role === 'admin' ? 'role-admin' : 'role-user';
   const mailboxLimit = user.mailbox_limit || 0;
   const mailboxCount = user.mailbox_count || 0;
-  const canSend = user.can_send ? '✓' : '✗';
+  const canSend = user.can_send ? '允许' : '停用';
   const canSendClass = user.can_send ? 'can-send' : 'cannot-send';
   const createdAt = formatTime(user.created_at);
   
@@ -56,7 +56,7 @@ export function renderUserRow(user) {
       <td class="col-created">${createdAt}</td>
       <td class="col-actions">
         <div class="user-actions">
-          <button class="btn btn-sm btn-edit" data-action="edit" data-user-id="${id}" title="编辑">✏️</button>
+          <button class="btn btn-sm btn-edit" data-action="edit" data-user-id="${id}" title="编辑" aria-label="编辑用户">编辑</button>
         </div>
       </td>
     </tr>

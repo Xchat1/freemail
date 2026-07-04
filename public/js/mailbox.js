@@ -289,7 +289,7 @@ async function changePassword() {
       els.confirmPasswordInput.value = '';
       
       // 密码修改成功，强制退出登录
-      showToast('密码修改成功，即将重新登录...', 'success');
+      showToast('密码修改成功，即将重新登录…', 'success');
       stopAutoRefresh();
       
       // 清除会话

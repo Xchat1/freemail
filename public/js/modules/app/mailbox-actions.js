@@ -167,6 +167,9 @@ export function updateEmailDisplay(elements, address) {
   const emailText = document.getElementById('email-text');
   if (emailText) emailText.textContent = address;
   else if (email) email.textContent = address;
+
+  document.body.classList.add('mail-no-selection');
+  document.getElementById('reading-pane')?.classList.remove('has-message');
   
   email?.classList.add('has-email');
   if (emailActions) emailActions.style.display = 'grid';

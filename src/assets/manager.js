@@ -85,6 +85,25 @@ export class AssetManager {
     return this.guestOnlyPaths.has(pathname);
   }
 
+  isMailboxPage(pathname) {
+    return pathname === '/mailbox.html' ||
+      pathname === '/html/mailbox.html' ||
+      pathname === '/mailbox' ||
+      pathname === '/mailbox/';
+  }
+
+  isMailboxesPage(pathname) {
+    return pathname === '/mailboxes.html' ||
+      pathname === '/html/mailboxes.html';
+  }
+
+  isStrictAdminPayload(payload, env) {
+    if (!payload || payload.role !== 'admin') return false;
+    if (String(payload.username || '') === '__root__') return true;
+    const adminName = String(env?.ADMIN_NAME || 'admin').trim().toLowerCase();
+    return String(payload.username || '').trim().toLowerCase() === adminName;
+  }
+
   async handleAssetRequest(request, env, mailDomains) {
     const url = new URL(request.url);
     const pathname = url.pathname;
@@ -95,7 +114,7 @@ export class AssetManager {
     }
 
     if (this.isProtectedPath(pathname)) {
-      const authResult = await this.checkProtectedPathAuth(request, JWT_TOKEN, url);
+      const authResult = await this.checkProtectedPathAuth(request, env, JWT_TOKEN, url);
       if (authResult) return authResult;
     }
 
@@ -143,25 +162,32 @@ export class AssetManager {
     return Response.redirect(new URL('/templates/loading.html', url).toString(), 302);
   }
 
-  async checkProtectedPathAuth(request, JWT_TOKEN, url) {
+  async checkProtectedPathAuth(request, env, JWT_TOKEN, url) {
     const payload = await resolveAuthPayload(request, JWT_TOKEN);
 
     if (!payload) {
       const loading = new URL('/templates/loading.html', url);
-      if (url.pathname.includes('mailbox')) {
+      if (this.isMailboxPage(url.pathname)) {
         loading.searchParams.set('redirect', '/html/mailbox.html');
+      } else if (this.isMailboxesPage(url.pathname)) {
+        loading.searchParams.set('redirect', '/html/mailboxes.html');
       } else {
         loading.searchParams.set('redirect', '/admin.html');
       }
       return Response.redirect(loading.toString(), 302);
     }
 
-    if (url.pathname.includes('mailbox')) {
+    if (this.isMailboxPage(url.pathname)) {
       if (payload.role !== 'mailbox') {
         return Response.redirect(new URL('/', url).toString(), 302);
       }
       if (url.pathname === '/' || url.pathname === '/index.html') {
         return Response.redirect(new URL('/html/mailbox.html', url).toString(), 302);
+      }
+    } else if (this.isMailboxesPage(url.pathname)) {
+      const isAllowed = (this.isStrictAdminPayload(payload, env) || payload.role === 'guest');
+      if (!isAllowed) {
+        return Response.redirect(new URL('/', url).toString(), 302);
       }
     } else {
       const isAllowed = (payload.role === 'admin' || payload.role === 'guest' || payload.role === 'mailbox');
@@ -292,7 +318,7 @@ export class AssetManager {
       );
       return env.ASSETS.fetch(loadingReq);
     }
-    const isStrictAdmin = (payload.role === 'admin' && (payload.username === '__root__' || payload.username));
+    const isStrictAdmin = this.isStrictAdminPayload(payload, env);
     const isGuest = (payload.role === 'guest');
     if (!isStrictAdmin && !isGuest) {
       return Response.redirect(new URL('/', url).toString(), 302);

@@ -45,10 +45,10 @@ export async function showToast(message, type = 'info', duration = 3000) {
   
   // 图标映射
   const icons = {
-    success: '✓',
-    error: '✕',
-    warning: '⚠',
-    info: 'ℹ'
+    success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-check"/></svg>',
+    error: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-x"/></svg>',
+    warning: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-alert"/></svg>',
+    info: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-mail"/></svg>'
   };
   
   // 背景色映射
@@ -74,10 +74,12 @@ export async function showToast(message, type = 'info', duration = 3000) {
     transition: opacity 0.3s ease, transform 0.3s ease;
   `;
   
-  toast.innerHTML = `
-    <span style="font-size: 16px;">${icons[type] || icons.info}</span>
-    <span>${message}</span>
-  `;
+  const iconEl = document.createElement('span');
+  iconEl.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;flex-shrink:0;';
+  iconEl.innerHTML = icons[type] || icons.info;
+  const messageEl = document.createElement('span');
+  messageEl.textContent = String(message || '');
+  toast.append(iconEl, messageEl);
   
   container.appendChild(toast);
   

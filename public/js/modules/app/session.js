@@ -67,7 +67,7 @@ export function applySessionUI(session) {
         badge.textContent = '超级管理员';
       } else if (session.role === 'admin') {
         badge.classList.add('role-admin');
-        badge.textContent = `高级用户：${session.username || ''}`;
+        badge.textContent = `管理员：${session.username || ''}`;
       } else if (session.role === 'user') {
         badge.classList.add('role-user');
         badge.textContent = `用户：${session.username || ''}`;
@@ -131,7 +131,7 @@ export async function validateSession() {
 export function showGuestBanner() {
   const bar = document.createElement('div');
   bar.className = 'demo-banner';
-  bar.innerHTML = '👀 当前为 <strong>观看模式</strong>（模拟数据，仅演示）。要接收真实邮件，请自建部署或联系部署。';
+  bar.innerHTML = '当前为 <strong>演示模式</strong>，所有数据仅用于界面预览。';
   document.body.prepend(bar);
 }
 

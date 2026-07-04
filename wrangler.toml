@@ -3,23 +3,26 @@ name = "mailfree"
 main = "src/server.js"
 compatibility_date = "2024-01-01"
 keep_vars=true
+workers_dev = true
+routes = [
+  { pattern = "mail.walmartapi.com", custom_domain = true }
+]
 
 # D1 数据库绑定
 [[d1_databases]]
 binding = "TEMP_MAIL_DB"
 database_name = "maill_free_db" #你的d1数据库名称
-database_id = "c82663ac-62b6-4ba6-be81-cbe297f2a3dd" # 你的database_id
+database_id = "61132d06-7873-4529-b5d1-fbe9bd5a55a9" # 你的database_id
 # 登录会话过期时间（单位：天，默认7天）
 # 环境变量
 [vars]
 # FORWARD_RULES="[{"prefix":"vip","email":"a@example.com"},{"prefix":"*","email":"example@qq.com"}]"
-ADMIN_NAME=""
+ADMIN_NAME="admin"
 ADMIN_PASSWORD=""
-GUEST_PASSWORD="guest"
-JWT_TOKEN="fjiwaiv23164s4fdsfs6df6wfdx"
-JWT_TOKENGUEST_PASSWORD="dfsfsfxzcv"
+GUEST_PASSWORD=""
+JWT_TOKEN=""
 SESSION_EXPIRE_DAYS="365"
-MAIL_DOMAIN=""
+MAIL_DOMAIN="walmartapi.com"
 RESEND_API_KEY=""
 
 

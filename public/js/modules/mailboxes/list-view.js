@@ -68,7 +68,7 @@ export function renderMailboxListItem(mailbox, options = {}) {
           <span class="item-indicators">
             ${isFavorite ? '<span class="indicator favorite" title="已收藏"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><use href="/icons/sprites.svg#icon-star"/></svg></span>' : ''}
             ${forwardTo ? `<span class="indicator forward" title="转发至: ${escapeAttr(forwardTo)}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-forward"/></svg></span>` : ''}
-            ${canLogin ? '<span class="indicator login" title="可登录"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-key"/></svg></span>' : '<span class="indicator login-disabled" title="禁止登录"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-lock"/></svg></span>'}
+            ${canLogin ? '<span class="indicator login" title="可登录"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-key"/></svg></span>' : '<span class="indicator login-disabled" title="不允许登录"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-lock"/></svg></span>'}
           </span>
         </div>
       </div>
@@ -76,9 +76,9 @@ export function renderMailboxListItem(mailbox, options = {}) {
       <div class="item-actions">
         <button class="btn btn-sm" data-action="copy" title="复制"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-copy"/></svg></button>
         <button class="btn btn-sm" data-action="jump" title="查看"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-mail"/></svg></button>
-        <button class="btn btn-sm ${isFavorite ? 'active' : ''}" data-action="favorite" title="${isFavorite ? '取消收藏' : '收藏'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="${isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-star-${isFavorite ? '' : 'empty'}"/></svg></button>
+        <button class="btn btn-sm ${isFavorite ? 'active' : ''}" data-action="favorite" title="${isFavorite ? '取消收藏' : '收藏'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="${isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#${isFavorite ? 'icon-star' : 'icon-star-empty'}"/></svg></button>
         <button class="btn btn-sm" data-action="forward" title="转发设置"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-forward"/></svg></button>
-        <button class="btn btn-sm" data-action="toggle-login" title="${canLogin ? '禁止登录' : '允许登录'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-key"/></svg></button>
+        <button class="btn btn-sm" data-action="toggle-login" title="${canLogin ? '停用登录' : '允许登录'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-key"/></svg></button>
         <button class="btn btn-sm danger" data-action="delete" title="删除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-trash"/></svg></button>
       </div>
     </div>
@@ -109,7 +109,7 @@ export function renderListView(mailboxes, container, options = {}) {
 export function renderTableHeader() {
   return `
     <div class="table-header">
-      <div class="col-pin">📌</div>
+      <div class="col-pin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><use href="/icons/sprites.svg#icon-pin"/></svg></div>
       <div class="col-address">邮箱地址</div>
       <div class="col-status">状态</div>
       <div class="col-time">创建时间</div>
@@ -135,22 +135,22 @@ export function renderTableRow(mailbox) {
   const displayAddress = escapeHtml(address);
   
   const statusIcons = [
-    isFavorite ? '⭐' : '',
-    forwardTo ? '📤' : '',
-    canLogin ? '🔑' : ''
+    isFavorite ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><use href="/icons/sprites.svg#icon-star"/></svg>' : '',
+    forwardTo ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-forward"/></svg>' : '',
+    canLogin ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-key"/></svg>' : ''
   ].filter(Boolean).join(' ');
   
   return `
     <div class="table-row ${isPinned ? 'pinned' : ''}" data-address="${escapedAddress}">
       <div class="col-pin">
-        <button class="btn btn-sm ${isPinned ? 'active' : ''}" data-action="pin">${isPinned ? '📌' : '📍'}</button>
+        <button class="btn btn-sm ${isPinned ? 'active' : ''}" data-action="pin" title="${isPinned ? '取消置顶' : '置顶'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="${isPinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-pin"/></svg></button>
       </div>
       <div class="col-address" title="${escapedAddress}">${displayAddress}</div>
       <div class="col-status">${statusIcons || '-'}</div>
       <div class="col-time">${createdAt}</div>
       <div class="col-actions">
-        <button class="btn btn-sm" data-action="copy" title="复制">📋</button>
-        <button class="btn btn-sm" data-action="jump" title="查看">📧</button>
+        <button class="btn btn-sm" data-action="copy" title="复制"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-copy"/></svg></button>
+        <button class="btn btn-sm" data-action="jump" title="查看"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-mail"/></svg></button>
         <button class="btn btn-sm" data-action="more" title="更多">⋯</button>
       </div>
     </div>

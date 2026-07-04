@@ -66,7 +66,7 @@ async function doLogin(){
         }
         
         // 显示成功提示
-        await showToast('登录成功，正在跳转...', 'success');
+        await showToast('登录成功，正在跳转…', 'success');
         // 延时确保toast显示和cookie设置生效
         setTimeout(() => {
           location.replace(finalTarget);
@@ -116,4 +116,3 @@ async function doLogin(){
 btn.addEventListener('click', doLogin);
 pwd.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 username.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-

@@ -1,264 +1,190 @@
-<div class="topbar">
+<div class="topbar mail-topbar">
   <div class="brand">
     <span class="brand-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <use href="/icons/sprites.svg#icon-mail"/>
       </svg>
     </span>
-    <span class="brand-text">iDing's临时邮箱</span>
+    <span class="brand-text">Mail Console</span>
+  </div>
+  <div class="mail-search">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <use href="/icons/sprites.svg#icon-search"/>
+    </svg>
+    <input id="mb-search" class="input sidebar-search-input" placeholder="搜索邮箱地址" aria-label="搜索邮箱地址" />
   </div>
   <div id="role-badge" class="role-badge" title="欢迎用户："></div>
   <div class="nav-actions">
-    <a id="repo" class="btn btn-ghost" href="https://github.com/idinging/freemail" target="_blank" rel="noopener noreferrer" title="GitHub 开源仓库">
+    <button id="compose" class="btn btn-primary" aria-label="发邮件">
       <span class="btn-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <use href="/icons/sprites.svg#icon-github"/>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <use href="/icons/sprites.svg#icon-send"/>
         </svg>
       </span>
-      <span class="btn-text">GitHub</span>
-    </a>
+      <span class="btn-text">发邮件</span>
+    </button>
+    <button id="refresh" class="btn btn-ghost" aria-label="刷新邮件">
+      <span class="btn-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <use href="/icons/sprites.svg#icon-refresh"/>
+        </svg>
+      </span>
+      <span class="btn-text">刷新</span>
+    </button>
     <a id="admin" class="btn btn-ghost" href="/templates/loading.html?redirect=%2Fadmin.html&status=%E6%AD%A3%E5%9C%A8%E6%A0%A1%E9%AA%8C%E6%9D%83%E9%99%90%E2%80%A6" title="用户管理" style="display:none">
       <span class="btn-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <use href="/icons/sprites.svg#icon-wrench"/>
         </svg>
       </span>
       <span class="btn-text">用户管理</span>
     </a>
-    <a id="all-mailboxes" class="btn btn-ghost" href="/templates/loading.html?redirect=%2Fhtml%2Fmailboxes.html&status=%E6%AD%A3%E5%9C%A8%E6%89%93%E5%BC%80%E9%82%AE%E7%AE%B1%E6%80%BB%E8%A7%88%E9%A1%B5%E9%9D%A2%E2%80%A6" title="所有邮箱" style="display:none">
+    <a id="all-mailboxes" class="btn btn-ghost" href="/templates/loading.html?redirect=%2Fhtml%2Fmailboxes.html&status=%E6%AD%A3%E5%9C%A8%E6%89%93%E5%BC%80%E9%82%AE%E7%AE%B1%E6%80%BB%E8%A7%88%E9%A1%B5%E9%9D%A2%E2%80%A6" title="邮箱总览" style="display:none">
       <span class="btn-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <use href="/icons/sprites.svg#icon-package"/>
         </svg>
       </span>
-      <span class="btn-text">所有邮箱</span>
+      <span class="btn-text">邮箱总览</span>
     </a>
     <button id="logout" class="btn btn-secondary" title="退出登录">
       <span class="btn-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <use href="/icons/sprites.svg#icon-logout"/>
         </svg>
       </span>
       <span class="btn-text">退出登录</span>
     </button>
   </div>
-  </div>
+</div>
   <div class="toast" id="toast"></div>
-  <div class="container">
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h3>
-          <span class="sidebar-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <use href="/icons/sprites.svg#icon-inbox"/>
-            </svg>
-          </span>
-          <span class="sidebar-title">历史邮箱</span>
-        </h3>
-        <div class="sidebar-header-actions">
+  <div class="container mail-shell">
+    <aside class="sidebar mail-nav">
+      <div class="mailbox-account">
+        <div class="section-header compact">
+          <span class="section-title">当前邮箱</span>
           <span id="quota" class="quota-display"></span>
-          <button id="sidebar-toggle" class="sidebar-toggle-btn" title="收起侧板" aria-label="收起侧边栏">
-            <span id="sidebar-toggle-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <use href="/icons/sprites.svg#icon-chevron-left"/>
-              </svg>
-            </span>
-          </button>
-          <button id="mb-toggle" class="sidebar-toggle-btn" title="展开/收起历史邮箱" aria-label="展开或收起历史邮箱列表">
-            <span id="mb-toggle-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <use href="/icons/sprites.svg#icon-chevron-down"/>
-              </svg>
-            </span>
-          </button>
+        </div>
+        <div id="email" class="email-display compact-email">
+          <span id="email-text" class="email-text"><span class="placeholder-text">尚未选择邮箱</span></span>
         </div>
       </div>
-      <div class="sidebar-search">
-        <input id="mb-search" class="input sidebar-search-input" placeholder="搜索历史邮箱" aria-label="搜索历史邮箱" />
-      </div>
-      <div id="mb-list"></div>
-      <div id="mb-loading" style="margin-top:12px"></div>
-      <div id="mb-pager" class="pager" style="display:none;margin-top:16px">
-        <button id="mb-prev" class="btn btn-ghost btn-sm">上一页</button>
-        <span id="mb-page-info" class="muted" style="min-width:100px;text-align:center"></span>
-        <button id="mb-next" class="btn btn-ghost btn-sm">下一页</button>
-      </div>
-    </div>
-    <div class="main">
-      <div class="card generate-card">
-        <h2>
-          <span class="card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <use href="/icons/sprites.svg#icon-sparkles"/>
-            </svg>
-          </span>
-          生成临时邮箱
-        </h2>
 
-        <div class="mailbox-layout">
-          <!-- 左侧：邮箱地址展示 -->
-          <div class="mailbox-display-section">
-            <div class="mailbox-display-content">
-              <div class="section-header">
-                <span class="section-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <use href="/icons/sprites.svg#icon-mail"/>
-                  </svg>
-                </span>
-                <span class="section-title">当前邮箱</span>
-              </div>
-              <div id="email" class="email-display">
-                <span id="email-text" class="email-text"><span class="placeholder-text">点击右侧生成按钮创建邮箱地址</span></span>
-                <div id="custom-overlay" class="custom-overlay" style="display:none">
-                  <input id="custom-local-overlay" class="input custom-input" type="text" placeholder="仅限字母/数字/._-" aria-label="自定义邮箱用户名" />
-                  <button id="create-custom-overlay" class="btn btn-primary btn-sm">创建</button>
-                </div>
-              </div>
-            </div>
-            <div class="mailbox-actions" id="email-actions" style="display:none">
-              <button id="copy" class="btn btn-secondary" style="width:100%" aria-label="复制邮箱地址">
-                <span class="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <use href="/icons/sprites.svg#icon-copy"/>
-                  </svg>
-                </span>
-                <span>复制邮箱</span>
-              </button>
-              <button id="compose" class="btn btn-primary" style="width:100%" aria-label="发邮件">
-                <span class="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <use href="/icons/sprites.svg#icon-send"/>
-                  </svg>
-                </span>
-                <span>发邮件</span>
-              </button>
-              <button id="clear" class="btn btn-danger" style="width:100%" aria-label="清空邮件">
-                <span class="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <use href="/icons/sprites.svg#icon-trash"/>
-                  </svg>
-                </span>
-                <span>清空邮件</span>
-              </button>
-              <button id="refresh" class="btn btn-ghost" style="width:100%" aria-label="刷新邮件">
-                <span class="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <use href="/icons/sprites.svg#icon-refresh"/>
-                  </svg>
-                </span>
-                <span>刷新邮件</span>
-              </button>
-              <button id="forward-setting" class="btn btn-ghost" style="width:100%" aria-label="转发设置">
-                <span class="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <use href="/icons/sprites.svg#icon-forward"/>
-                  </svg>
-                </span>
-                <span>转发设置</span>
-              </button>
-              <button id="toggle-favorite" class="btn btn-ghost" style="width:100%" aria-label="收藏邮箱">
-                <span class="btn-icon" id="favorite-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <use href="/icons/sprites.svg#icon-star-empty"/>
-                  </svg>
-                </span>
-                <span id="favorite-text">收藏邮箱</span>
-              </button>
+      <div class="folder-nav" aria-label="邮箱导航">
+        <button id="tab-inbox" class="seg-btn folder-item active" aria-pressed="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <use href="/icons/sprites.svg#icon-inbox"/>
+          </svg>
+          <span>收件箱</span>
+        </button>
+        <button id="tab-sent" class="seg-btn folder-item" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <use href="/icons/sprites.svg#icon-send"/>
+          </svg>
+          <span>已发送</span>
+        </button>
+        <button class="folder-item muted-folder" type="button" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <use href="/icons/sprites.svg#icon-inbox-empty"/>
+          </svg>
+          <span>草稿</span>
+        </button>
+      </div>
+
+      <details class="mailbox-generator">
+        <summary>
+          <span>新建邮箱</span>
+          <span class="summary-hint">展开</span>
+        </summary>
+        <div class="config-form">
+          <label class="config-label" for="domain-select">邮箱后缀</label>
+          <select id="domain-select" class="select config-select" aria-label="选择邮箱后缀域名"></select>
+          <label class="config-label" for="len-range">用户名长度</label>
+          <div class="range-container">
+            <input id="len-range" class="range" type="range" min="8" max="30" step="1" value="8" aria-label="设置用户名长度" />
+            <div class="range-display">
+              <span id="len-val" class="len-value">8</span>
+              <span class="len-unit">位</span>
             </div>
           </div>
+          <div id="custom-overlay" class="custom-overlay" style="display:none">
+            <input id="custom-local-overlay" class="input custom-input" type="text" placeholder="自定义前缀" aria-label="自定义邮箱用户名" />
+            <button id="create-custom-overlay" class="btn btn-primary btn-sm">创建</button>
+          </div>
+          <div class="generate-buttons">
+            <button id="gen" class="btn btn-generate" aria-label="随机生成邮箱">
+              <span>随机生成</span>
+            </button>
+            <button id="gen-name" class="btn btn-secondary" title="使用随机人名生成邮箱" aria-label="使用随机人名生成邮箱">
+              <span>随机人名</span>
+            </button>
+          </div>
+          <button id="toggle-custom" class="btn btn-ghost btn-sm" title="自定义邮箱" aria-label="切换到自定义邮箱模式">自定义地址</button>
+        </div>
+      </details>
 
-          <!-- 右侧：邮箱配置 -->
-          <div class="mailbox-config-section">
-            <div class="section-header">
-              <span class="section-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <use href="/icons/sprites.svg#icon-settings"/>
+      <div class="mailbox-history">
+        <div class="sidebar-header">
+          <h3>
+            <span class="sidebar-title">历史邮箱</span>
+          </h3>
+          <div class="sidebar-header-actions">
+            <button id="sidebar-toggle" class="sidebar-toggle-btn" title="收起侧板" aria-label="收起侧边栏">
+              <span id="sidebar-toggle-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <use href="/icons/sprites.svg#icon-chevron-left"/>
                 </svg>
               </span>
-              <span class="section-title">邮箱配置</span>
-              <button id="config-toggle" class="sidebar-toggle-btn" title="展开/收起配置" aria-label="展开或收起配置面板">
-                <span id="config-toggle-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <use href="/icons/sprites.svg#icon-chevron-down"/>
-                  </svg>
-                </span>
-              </button>
-            </div>
-            <div class="config-form">
-              <div class="config-item">
-                <label class="config-label" for="domain-select">
-                  <span class="label-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <use href="/icons/sprites.svg#icon-globe"/>
-                    </svg>
-                  </span>
-                  <span>邮箱后缀</span>
-                </label>
-                <select id="domain-select" class="select config-select" aria-label="选择邮箱后缀域名"></select>
-              </div>
-              <div class="config-item">
-                <label class="config-label" for="len-range">
-                  <span class="label-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <use href="/icons/sprites.svg#icon-ruler"/>
-                    </svg>
-                  </span>
-                  <span>用户名长度</span>
-                </label>
-                <div class="range-container">
-                  <input id="len-range" class="range" type="range" min="8" max="30" step="1" value="8" aria-label="设置用户名长度" />
-                  <div class="range-display">
-                    <span id="len-val" class="len-value">8</span>
-                    <span class="len-unit">位</span>
-                  </div>
-                </div>
-              </div>
-               <div class="generate-action">
-                 <div class="generate-buttons" style="display: flex; gap: 8px; margin-bottom: 8px; width: 100%;">
-                   <button id="gen" class="btn btn-generate" style="flex: 1;" aria-label="随机生成邮箱">
-                     <span class="btn-icon">
-                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                         <use href="/icons/sprites.svg#icon-dice"/>
-                       </svg>
-                     </span>
-                     <span>随机生成</span>
-                   </button>
-                   <button id="gen-name" class="btn btn-primary" style="flex: 1;" title="使用随机人名生成邮箱" aria-label="使用随机人名生成邮箱">
-                     <span class="btn-icon">
-                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                         <use href="/icons/sprites.svg#icon-user"/>
-                       </svg>
-                     </span>
-                     <span>随机人名</span>
-                   </button>
-                 </div>
-                 <button id="toggle-custom" class="btn btn-secondary btn-sm" style="width: 100%;" title="自定义邮箱" aria-label="切换到自定义邮箱模式">切换自定义</button>
-               </div>
-            </div>
+            </button>
+            <button id="mb-toggle" class="sidebar-toggle-btn" title="展开/收起历史邮箱" aria-label="展开或收起历史邮箱列表">
+              <span id="mb-toggle-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <use href="/icons/sprites.svg#icon-chevron-down"/>
+                </svg>
+              </span>
+            </button>
           </div>
         </div>
+        <div id="mb-list"></div>
+        <div id="mb-loading" style="margin-top:12px"></div>
+        <div id="mb-pager" class="pager" style="display:none;margin-top:16px">
+          <button id="mb-prev" class="btn btn-ghost btn-sm">上一页</button>
+          <span id="mb-page-info" class="muted" style="min-width:100px;text-align:center"></span>
+          <button id="mb-next" class="btn btn-ghost btn-sm">下一页</button>
+        </div>
       </div>
-      <div class="card inbox-card" id="list-card" style="display:none">
+    </aside>
+
+    <main class="mail-list-pane">
+      <div class="card inbox-card" id="list-card" style="display:block">
         <div class="listcard-header">
           <h2 class="listcard-title">
             <span class="card-icon" id="box-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <use href="/icons/sprites.svg#icon-inbox"/>
               </svg>
             </span>
             <span id="box-title">收件箱</span>
           </h2>
-          <div class="view-switch">
-            <button id="tab-inbox" class="seg-btn" aria-pressed="true">收件箱</button>
-            <button id="tab-sent" class="seg-btn" aria-pressed="false">发件箱</button>
-          </div>
           <div id="list-status" class="loading-indicator" style="pointer-events:none" role="status" aria-live="polite">
             <div id="list-spinner" class="spinner"></div>
             <span id="list-status-text">加载中…</span>
           </div>
         </div>
-        <div class="list-viewport" style="position:relative;contain:layout paint;isolation:isolate;">
-          <div id="list" class="list"></div>
+        <div class="list-viewport">
+          <div id="list" class="list">
+            <div class="empty-state mail-empty-state">
+              <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <use href="/icons/sprites.svg#icon-inbox"/>
+              </svg>
+              <strong>暂无邮件</strong>
+              <span class="empty-text">选择历史邮箱，或新建一个邮箱后等待邮件进入。</span>
+              <div class="empty-actions">
+                <button class="btn btn-primary btn-sm" onclick="document.querySelector('.mailbox-generator')?.setAttribute('open','')">新建邮箱</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.refreshEmails && window.refreshEmails()">刷新</button>
+              </div>
+            </div>
+          </div>
           <div id="list-pager" class="pager" style="display:none">
             <button id="prev-page" class="btn btn-ghost btn-sm">上一页</button>
             <span id="page-info" class="muted" style="min-width:100px;text-align:center"></span>
@@ -266,7 +192,34 @@
           </div>
         </div>
       </div>
-    </div>
+    </main>
+
+    <aside class="mail-detail-pane" id="reading-pane">
+      <div class="reading-header">
+        <div>
+          <span class="reading-eyebrow">邮件内容</span>
+          <h2 id="reading-subject">选择一封邮件</h2>
+        </div>
+        <div class="mailbox-actions detail-actions" id="email-actions" style="display:none">
+          <button id="copy" class="btn btn-secondary btn-sm" aria-label="复制邮箱地址">复制邮箱</button>
+          <button id="forward-setting" class="btn btn-ghost btn-sm" aria-label="转发设置">转发</button>
+          <button id="toggle-favorite" class="btn btn-ghost btn-sm" aria-label="收藏邮箱">
+            <span id="favorite-icon"></span>
+            <span id="favorite-text">收藏</span>
+          </button>
+          <button id="clear" class="btn btn-danger btn-sm" aria-label="清空邮件">清空</button>
+        </div>
+      </div>
+      <div id="reading-meta" class="reading-meta"></div>
+      <div id="reading-content" class="reading-content">
+        <div class="reading-empty">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <use href="/icons/sprites.svg#icon-mail"/>
+          </svg>
+          <p>从中间列表选择一封邮件，内容会在这里显示。</p>
+        </div>
+      </div>
+    </aside>
   </div>
 
   <div id="footer-slot"></div>
@@ -347,7 +300,7 @@
           </div>
           <div class="field-group">
             <label class="field-label" for="compose-from-name">发件名称（可选）</label>
-            <input id="compose-from-name" class="input field-input" type="text" placeholder="例如：iDing 支持团队" />
+            <input id="compose-from-name" class="input field-input" type="text" placeholder="例如：支持团队" />
           </div>
           <div class="field-group">
             <label class="field-label" for="compose-subject">主题</label>

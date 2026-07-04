@@ -70,7 +70,7 @@ export function initCompose(elements, api, showToast) {
       // 设置加载状态
       const originalText = composeSend.textContent;
       composeSend.disabled = true;
-      composeSend.innerHTML = '<span class="spinner"></span> 发送中...';
+      composeSend.innerHTML = '<span class="spinner"></span> 发送中…';
       
       try {
         const body = {
@@ -111,10 +111,10 @@ export function initCompose(elements, api, showToast) {
  */
 export function showSentEmailDetail(email, elements) {
   const { modal, modalSubject, modalContent } = elements;
-  if (!modal || !email) return;
+  if (!email) return;
   
   const e = email;
-  modalSubject.innerHTML = `
+  const subjectHtml = `
     <span class="modal-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-send"/></svg></span>
     <span>${escapeHtml(e.subject || '(无主题)')}</span>
   `;
@@ -132,7 +132,7 @@ export function showSentEmailDetail(email, elements) {
   const statusInfo = statusMap[status] || { class: '', text: status };
   statusBadge = `<span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>`;
   
-  modalContent.innerHTML = `
+  const detailHtml = `
     <div class="sent-detail">
       <div class="detail-meta">
         <div class="meta-row"><span class="meta-label">收件人：</span><span class="meta-value">${escapeHtml(recipients)}</span></div>
@@ -144,6 +144,25 @@ export function showSentEmailDetail(email, elements) {
       </div>
     </div>
   `;
+
+  const readingPane = document.getElementById('reading-pane');
+  const readingSubject = document.getElementById('reading-subject');
+  const readingMeta = document.getElementById('reading-meta');
+  const readingContent = document.getElementById('reading-content');
+  if (readingPane && readingSubject && readingMeta && readingContent) {
+    document.querySelectorAll('.email-item').forEach(el => {
+      el.classList.toggle('selected', el.dataset.emailId === String(e.id));
+    });
+    readingPane.classList.add('has-message');
+    readingSubject.textContent = e.subject || '(无主题)';
+    readingMeta.innerHTML = `<div class="email-meta-inline"><span>收件人：${escapeHtml(recipients)}</span><span>${statusBadge}</span><span>发送时间：${escapeHtml(e.created_at || '')}</span></div>`;
+    readingContent.innerHTML = detailHtml;
+    return;
+  }
+
+  if (!modal || !modalSubject || !modalContent) return;
+  modalSubject.innerHTML = subjectHtml;
+  modalContent.innerHTML = detailHtml;
   
   modal.classList.add('show');
 }

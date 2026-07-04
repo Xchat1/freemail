@@ -166,29 +166,35 @@ export function renderEmailItem(email, isMobile = false) {
   const metaLabel = isSentView ? '收件人' : '发件人';
   const metaText = isSentView ? escapeHtml(recipientsDisplay) : senderText;
   const timeDisplay = isMobile ? formatTsMobile(e.received_at || e.created_at) : formatTs(e.received_at || e.created_at);
+  const compactTimeDisplay = timeDisplay.replace(/.*?(\d{2}:\d{2})(?::\d{2})?.*/, '$1');
   // 收件箱视图时显示收件人地址（别名地址）
   const toAddrDisplay = !isSentView && recipientsDisplay ? escapeHtml(recipientsDisplay) : '';
   
   return `
-    <div class="email-item clickable" onclick="${isSentView ? `showSentEmail(${e.id})` : `showEmail(${e.id})`}">
-      <div class="email-meta">
-        <span class="meta-from"><span class="meta-label">${metaLabel}</span><span class="meta-from-text">${metaText}</span></span>
-        ${!isSentView && toAddrDisplay ? `<span class="meta-to"><span class="meta-label">收件人</span><span class="meta-to-text">${toAddrDisplay}</span></span>` : ''}
-        <span class="email-time"><span class="time-icon">🕐</span>${timeDisplay}</span>
-      </div>
-      <div class="email-content">
-        <div class="email-main">
-          <div class="email-line"><span class="label-chip">主题</span><span class="value-text subject">${subjectText}</span></div>
-          <div class="email-line"><span class="label-chip">内容</span>${hasContent ? `<span class="email-preview value-text">${previewText}</span>` : '<span class="email-preview value-text" style="color:#94a3b8">(暂无预览)</span>'}</div>
+    <div class="email-item clickable" data-email-id="${e.id}" onclick="${isSentView ? `showSentEmail(${e.id})` : `showEmail(${e.id})`}">
+      <div class="email-row-main">
+        <span class="meta-from-text">${metaText || '(未知发件人)'}</span>
+        <div class="email-summary">
+          <div class="email-summary-line">
+            <span class="subject">${subjectText}</span>
+            <span class="email-preview value-text">${hasContent ? previewText : '(暂无预览)'}</span>
+          </div>
+          ${!isSentView && toAddrDisplay ? `<span class="meta-to-text">${toAddrDisplay}</span>` : ''}
         </div>
-        <div class="email-actions">
-          ${isSentView ? `
-            <span class="status-badge ${statusClass(e.status)}">${e.status || 'unknown'}</span>
-            <button class="btn btn-danger btn-sm" onclick="deleteSent(${e.id});event.stopPropagation()" title="删除记录"><span class="btn-icon">🗑️</span></button>
-          ` : `
-            <button class="btn btn-secondary btn-sm" data-code="${listCode || ''}" onclick="copyFromList(event, ${e.id});event.stopPropagation()" title="复制内容或验证码"><span class="btn-icon">📋</span></button>
-            <button class="btn btn-danger btn-sm" onclick="deleteEmail(${e.id});event.stopPropagation()" title="删除邮件"><span class="btn-icon">🗑️</span></button>
-          `}
+        <div class="email-row-side">
+          <span class="email-time">
+            <span class="time-full">${timeDisplay}</span>
+            <span class="time-short">${compactTimeDisplay}</span>
+          </span>
+          <div class="email-actions">
+            ${isSentView ? `
+              <span class="status-badge ${statusClass(e.status)}">${e.status || 'unknown'}</span>
+              <button class="btn btn-danger btn-sm" onclick="deleteSent(${e.id});event.stopPropagation()" title="删除记录">删除</button>
+            ` : `
+              <button class="btn btn-secondary btn-sm" data-code="${listCode || ''}" onclick="copyFromList(event, ${e.id});event.stopPropagation()" title="复制内容或验证码">复制</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteEmail(${e.id});event.stopPropagation()" title="删除邮件">删除</button>
+            `}
+          </div>
         </div>
       </div>
     </div>`;

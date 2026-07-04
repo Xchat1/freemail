@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>我的邮箱 - iDing's临时邮箱</title>
+  <title>我的邮箱 - Mail Console</title>
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -23,9 +23,10 @@
   <link rel="stylesheet" href="/css/app-modal.css" />
   <link rel="stylesheet" href="/css/app-responsive.css" />
   <link rel="stylesheet" href="/css/mailbox.css" />
-  <!-- 暗黑模式样式 -->
+  <!-- 深色模式样式 -->
   <link rel="stylesheet" href="/css/app_black.css" />
   <link rel="stylesheet" href="/css/mailbox_black.css" />
+  <link rel="stylesheet" href="/css/professional.css" />
   <!-- 主题切换支持 -->
   <script src="/js/theme-toggle.js"></script>
   <script src="/js/auth-guard.js" defer></script>
@@ -64,7 +65,7 @@
           <use href="/icons/sprites.svg#icon-mail"/>
         </svg>
       </span>
-      <span class="brand-text">iDing's临时邮箱</span>
+      <span class="brand-text">Mail Console</span>
     </div>
     <div id="role-badge" class="role-badge" title="邮箱用户">邮箱用户</div>
     <div class="nav-actions">
@@ -109,7 +110,7 @@
               <use href="/icons/sprites.svg#icon-mail"/>
             </svg>
           </span>
-          <span id="current-mailbox" class="mailbox-address">加载中...</span>
+          <span id="current-mailbox" class="mailbox-address">加载中…</span>
           <button id="copy-mailbox" class="btn btn-secondary btn-sm" title="复制邮箱地址" aria-label="复制邮箱地址">
             <span class="btn-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -236,8 +237,6 @@
     }catch(_){ }
   })();
 </script>
-</body>
-</html>
 <!-- 确认删除模态框 -->
 <div class="modal" id="confirm-modal">
   <div class="modal-card confirm-card">
@@ -314,3 +313,5 @@
     </div>
   </div>
 </div>
+</body>
+</html>

@@ -13,6 +13,10 @@ injectDialogStyles();
 // showToast 由 toast-utils.js 全局提供
 const showToast = window.showToast || ((msg, type) => console.log(`[${type}] ${msg}`));
 
+function icon(name, size = 18) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="/icons/sprites.svg#icon-${name}"/></svg>`;
+}
+
 // DOM 元素
 const els = {
   grid: document.getElementById('grid'),
@@ -126,7 +130,7 @@ function bindCardEvents() {
       if (e.target.closest('.actions')) return;
       const address = card.dataset.address;
       if (address) {
-        showToast('跳转中...', 'info', 500);
+        showToast('正在打开邮箱…', 'info', 500);
         setTimeout(() => location.href = `/?mailbox=${encodeURIComponent(address)}`, 600);
       }
     };
@@ -152,7 +156,7 @@ function bindCardEvents() {
           catch(_) { showToast('复制失败', 'error'); }
           break;
         case 'jump':
-          showToast('跳转中...', 'info', 500);
+          showToast('正在打开邮箱…', 'info', 500);
           setTimeout(() => location.href = `/?mailbox=${encodeURIComponent(address)}`, 600);
           break;
         case 'pin':
@@ -184,7 +188,7 @@ function bindCardEvents() {
           if (mailbox) {
             try {
               await apiToggleLogin(address, !mailbox.can_login);
-              showToast(mailbox.can_login ? '已禁止登录' : '已允许登录', 'success');
+              showToast(mailbox.can_login ? '已停用登录' : '已允许登录', 'success');
               load();
             } catch(e) { showToast('操作失败', 'error'); }
           }
@@ -249,7 +253,7 @@ function openPasswordModal(address, isDefault) {
   
   if (isDefault) {
     // 设置新密码
-    if (els.passwordModalIcon) els.passwordModalIcon.textContent = '🔐';
+    if (els.passwordModalIcon) els.passwordModalIcon.innerHTML = icon('lock', 20);
     if (els.passwordModalTitle) els.passwordModalTitle.textContent = '设置密码';
     if (els.passwordModalMessage) els.passwordModalMessage.innerHTML = `为 <strong>${address}</strong> 设置新密码：`;
     if (els.passwordInputWrapper) els.passwordInputWrapper.style.display = 'block';
@@ -258,7 +262,7 @@ function openPasswordModal(address, isDefault) {
     if (els.passwordNewInput) els.passwordNewInput.type = 'password';
   } else {
     // 重置密码
-    if (els.passwordModalIcon) els.passwordModalIcon.textContent = '🔓';
+    if (els.passwordModalIcon) els.passwordModalIcon.innerHTML = icon('unlock', 20);
     if (els.passwordModalTitle) els.passwordModalTitle.textContent = '重置密码';
     if (els.passwordModalMessage) els.passwordModalMessage.innerHTML = `确定将 <strong>${address}</strong> 的密码重置为默认密码（邮箱地址）？`;
     if (els.passwordInputWrapper) els.passwordInputWrapper.style.display = 'none';
@@ -320,9 +324,9 @@ async function executePasswordAction() {
 }
 
 // 打开批量操作模态框
-function openBatchModal(action, title, icon, message) {
+function openBatchModal(action, title, iconName, message) {
   currentBatchAction = action;
-  if (els.batchModalIcon) els.batchModalIcon.textContent = icon;
+  if (els.batchModalIcon) els.batchModalIcon.innerHTML = icon(iconName, 20);
   if (els.batchModalTitle) els.batchModalTitle.textContent = title;
   if (els.batchModalMessage) els.batchModalMessage.textContent = message;
   if (els.batchEmailsInput) els.batchEmailsInput.value = '';
@@ -443,12 +447,12 @@ els.viewList?.addEventListener('click', () => switchView('list'));
 els.logout?.addEventListener('click', async () => { try { await fetch('/api/logout', { method: 'POST' }); } catch(_) {} location.replace('/html/login.html'); });
 
 // 批量操作按钮
-els.batchAllow?.addEventListener('click', () => openBatchModal('allow', '批量放行登录', '✅', '输入要允许登录的邮箱地址（每行一个或用逗号分隔）：'));
-els.batchDeny?.addEventListener('click', () => openBatchModal('deny', '批量禁止登录', '🚫', '输入要禁止登录的邮箱地址（每行一个或用逗号分隔）：'));
-els.batchFavorite?.addEventListener('click', () => openBatchModal('favorite', '批量收藏', '⭐', '输入要收藏的邮箱地址（每行一个或用逗号分隔）：'));
-els.batchUnfavorite?.addEventListener('click', () => openBatchModal('unfavorite', '批量取消收藏', '☆', '输入要取消收藏的邮箱地址（每行一个或用逗号分隔）：'));
-els.batchForward?.addEventListener('click', () => openBatchModal('forward', '批量设置转发', '↪️', '输入要设置转发的邮箱地址（每行一个或用逗号分隔）：'));
-els.batchClearForward?.addEventListener('click', () => openBatchModal('clear-forward', '批量清除转发', '🚫', '输入要清除转发的邮箱地址（每行一个或用逗号分隔）：'));
+els.batchAllow?.addEventListener('click', () => openBatchModal('allow', '批量允许登录', 'check-circle', '输入要允许登录的邮箱地址（每行一个或用逗号分隔）：'));
+els.batchDeny?.addEventListener('click', () => openBatchModal('deny', '批量停用登录', 'x-circle', '输入要停用登录的邮箱地址（每行一个或用逗号分隔）：'));
+els.batchFavorite?.addEventListener('click', () => openBatchModal('favorite', '批量收藏', 'star', '输入要收藏的邮箱地址（每行一个或用逗号分隔）：'));
+els.batchUnfavorite?.addEventListener('click', () => openBatchModal('unfavorite', '批量取消收藏', 'star-empty', '输入要取消收藏的邮箱地址（每行一个或用逗号分隔）：'));
+els.batchForward?.addEventListener('click', () => openBatchModal('forward', '批量设置转发', 'forward', '输入要设置转发的邮箱地址（每行一个或用逗号分隔）：'));
+els.batchClearForward?.addEventListener('click', () => openBatchModal('clear-forward', '批量清除转发', 'x-circle', '输入要清除转发的邮箱地址（每行一个或用逗号分隔）：'));
 
 // 批量操作模态框事件
 els.batchModalClose?.addEventListener('click', closeBatchModal);

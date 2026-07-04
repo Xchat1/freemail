@@ -8,8 +8,8 @@
 ### 首页
 ![Image #2 首页](../pic/dark/shouye.png)
 
-### 所有邮箱
-![Image #3 所有邮箱](../pic/dark/suoyouyouxiang.png)
+### 邮箱总览
+![Image #3 邮箱总览](../pic/dark/suoyouyouxiang.png)
 
 ### 邮箱管理操作
 

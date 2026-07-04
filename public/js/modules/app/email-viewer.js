@@ -52,6 +52,22 @@ export async function showEmailDetail(id, elements, api, showToast) {
       bodyHtml = `<div class="email-content-area"><pre class="email-content-text" style="white-space:pre-wrap;word-break:break-word">${escapeHtml(email.content || '')}</pre></div>`;
     }
 
+    const readingPane = document.getElementById('reading-pane');
+    const readingSubject = document.getElementById('reading-subject');
+    const readingMeta = document.getElementById('reading-meta');
+    const readingContent = document.getElementById('reading-content');
+    if (readingPane && readingSubject && readingMeta && readingContent) {
+      document.querySelectorAll('.email-item').forEach(el => {
+        el.classList.toggle('selected', el.dataset.emailId === String(id));
+      });
+      document.body.classList.remove('mail-list-empty', 'mail-no-selection');
+      readingPane.classList.add('has-message');
+      readingSubject.textContent = email.subject || '(无主题)';
+      readingMeta.innerHTML = metaHtml;
+      readingContent.innerHTML = `<div class="email-detail-container">${codeHtml}${bodyHtml}</div>`;
+      return;
+    }
+
     modalContent.innerHTML = `<div class="email-detail-container">${metaHtml}${codeHtml}${bodyHtml}</div>`;
     modal.classList.add('show');
   } catch(e) {

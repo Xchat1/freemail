@@ -168,7 +168,7 @@ export function applySessionUI(session, elements = {}) {
         badge.textContent = '超级管理员';
       } else if (session.role === 'admin') {
         badge.classList.add('role-admin');
-        badge.textContent = `高级用户：${session.username || ''}`;
+        badge.textContent = `管理员：${session.username || ''}`;
       } else if (session.role === 'user') {
         badge.classList.add('role-user');
         badge.textContent = `用户：${session.username || ''}`;
